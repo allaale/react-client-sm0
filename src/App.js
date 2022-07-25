@@ -1,23 +1,65 @@
-import logo from './logo.svg';
+import {useState} from 'react'
+import axios from 'axios'
 import './App.css';
 
 function App() {
+  const serverUrl = 'http://localhost:5000'
+const [data, setData] = useState({price: 65, phone: null})
+const [response, setResponse] = useState({text: '', type: ''})
+
+
+
+const submitHandler = async () => {
+  // simple validation
+  if(data.phone === null || data.phone?.length !== 9) {
+    setResponse({text: 'Please add a valid number', type: 'error'})
+    return
+  }
+  
+  // call server
+  setResponse({text: 'Processing...'})
+  await axios
+  .post(`${serverUrl}/validate-xx`, JSON.stringify(data), {
+    headers: {
+      'content-type': 'application/json',
+    },
+  })
+  .then(function (res) {
+    setResponse(res.data) 
+  })
+  .catch(function (err) {
+    setResponse({text: 'Payment failed', type: 'error'})
+    
+  })
+}
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1>JuuJuu 👌</h1>
+      <div style={{width: '400px', margin: '0 auto', marginTop: '5em'}}><h4>Pay with Zaad/Evc/Sahal</h4></div>
+      <div className='box'>
+        <div className="display-flex-row display-space-bw">
+          <strong>Iphone pro 13 max magnetto case</strong>
+          <div className="display-flex-row">
+            <p>$</p>
+            <h4>145</h4>
+          </div>
+        </div>
+        <hr></hr>
+        
+        <div className="display-flex-row display-space-bw">
+
+        <div className="display-flex-row">
+          <p>+252</p>
+          <input type="number" placeholder='631234567' onChange={(e) => setData({...data, phone: e.target.value})} />
+        </div>
+        <button className='button-primary' onClick={() => submitHandler()}>Pay now</button>
+        </div>
+
+        {/* response */}
+        <p style={{color: response.type === 'success' ? 'green' : response.type === 'error' ? 'red' : 'black'}}>{response.text}</p>
+      </div>
     </div>
   );
 }
